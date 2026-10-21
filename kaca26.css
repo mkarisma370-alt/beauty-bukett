@@ -1,0 +1,280 @@
+/* =====================================================
+   [BARU] KACA 26 — tampilan & interaksi ala iOS 26 (Liquid Glass)
+   Lapisan tambahan; file lama tidak diubah.
+   ===================================================== */
+:root{
+  --k-spring:cubic-bezier(.2,1.35,.3,1);
+  --k-ease:cubic-bezier(.22,1,.36,1);
+  --k-tx:0;--k-ty:0;--k-t:0;--k-sheen:0deg;
+  --k-glass:linear-gradient(160deg,rgba(255,255,255,.17),rgba(255,255,255,.06) 42%,rgba(255,255,255,.1));
+  --k-panel:linear-gradient(165deg,rgba(70,56,108,.55),rgba(28,22,48,.66));
+  --k-edge:rgba(255,255,255,.16);
+  --k-fill:rgba(255,255,255,.08);
+  --k-fill2:rgba(255,255,255,.13);
+  --k-tint:linear-gradient(120deg,#ff5fa8,#b06cff);
+  --k-ink:var(--ink,#fff);
+  --k-mute:var(--muted,#c6c1da);
+}
+[data-theme=light]{
+  --k-glass:linear-gradient(160deg,rgba(255,255,255,.82),rgba(255,255,255,.5) 42%,rgba(255,255,255,.66));
+  --k-panel:linear-gradient(165deg,rgba(255,255,255,.86),rgba(246,239,255,.76));
+  --k-edge:rgba(120,90,180,.14);
+  --k-fill:rgba(120,90,180,.07);
+  --k-fill2:rgba(120,90,180,.12);
+}
+.k-ic{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+/* =====================================================
+   1. NAMA PEMBUKA TIDAK TERPOTONG
+   ===================================================== */
+.rb-intro-stage{max-width:100vw}
+.rb-intro-name{max-width:none;padding:0}
+.rb-intro-name span{white-space:nowrap;clip-path:inset(-25% 100% -25% -25%)}
+.rb-intro.play .rb-intro-name span{animation-name:kWrite}
+@keyframes kWrite{to{clip-path:inset(-25% -25% -25% -25%)}}
+
+/* =====================================================
+   2. KACA CAIR GLOBAL
+   ===================================================== */
+/* bingkai cahaya berputar mengikuti gerak HP / kursor / gulir */
+.glass:not(.toast)::before{background:linear-gradient(calc(145deg + var(--k-sheen) + var(--k-tx) * 28deg),rgba(255,255,255,.85),rgba(255,255,255,.12) 28%,rgba(255,255,255,.02) 52%,rgba(255,255,255,.28) 80%,rgba(255,255,255,.7))}
+[data-theme=light] .glass:not(.toast)::before{background:linear-gradient(calc(145deg + var(--k-sheen) + var(--k-tx) * 28deg),#fff,rgba(255,255,255,.4) 28%,rgba(160,130,220,.18) 52%,rgba(255,255,255,.5) 80%,#fff)}
+.glass{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 1px rgba(255,255,255,.06),0 18px 50px rgba(8,4,24,.28)}
+
+/* Header kapsul mengambang */
+.site-header{transition:transform .6s var(--k-spring),box-shadow .4s,background .4s}
+html.k-min .site-header{transform:translateY(-4px) scale(.965)}
+html.k-refract .site-header,html.k-refract .mobile-nav{-webkit-backdrop-filter:blur(16px) saturate(190%);backdrop-filter:url(#kLensa) blur(16px) saturate(190%) brightness(1.06)}
+.info-bar{transition:opacity .4s,transform .5s var(--k-ease)}
+html.k-min .info-bar{opacity:0;transform:translateY(-120%);pointer-events:none}
+
+/* Tepi gulir kabur (atas) */
+.k-edge.top{position:fixed;top:0;right:0;left:0;z-index:98;height:96px;pointer-events:none;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);-webkit-mask:linear-gradient(#000 35%,transparent);mask:linear-gradient(#000 35%,transparent);opacity:min(1,calc(var(--k-t) * 3))}
+
+/* Judul besar menyusut saat digulir */
+.page-title{transform:scale(calc(1 - var(--k-t) * .14));transform-origin:left bottom;opacity:calc(1 - var(--k-t) * .45);transition:transform .15s linear}
+
+/* Tombol: tekan "jelly" */
+.k-jelly{animation:kJelly .55s var(--k-ease)}
+@keyframes kJelly{0%{transform:scale(1)}28%{transform:scale(.9,.93)}55%{transform:scale(1.05,.98)}78%{transform:scale(.99,1.02)}100%{transform:scale(1)}}
+
+/* Ikon aksi cepat seperti ikon aplikasi */
+.qt-icon{position:relative;overflow:hidden;width:48px;height:48px;border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 6px rgba(0,0,0,.18),0 10px 22px rgba(0,0,0,.25)}
+.qt-icon::after{content:"";position:absolute;inset:0;background:linear-gradient(170deg,rgba(255,255,255,.45),rgba(255,255,255,0) 48%);pointer-events:none}
+.quick-tile{border-radius:30px}
+
+/* Logo hero 3D */
+.hero-logo-stage{perspective:800px}
+.hero-logo-stage .hero-logo-card,.hero-logo-stage:hover .hero-logo-card{transform:rotateX(calc(var(--ly,0) * -18deg)) rotateY(calc(var(--lx,0) * 20deg)) scale(calc(1 + (var(--lx,0) * var(--lx,0) + var(--ly,0) * var(--ly,0)) * .2));transition:transform .5s var(--k-ease)}
+
+/* Kartu produk: lebih lembut & responsif sentuhan */
+.product-card{border-radius:32px}
+.product-card:active{transform:scale(.98)!important;transition-duration:.15s}
+.favorite-button,.cart-add{transition:transform .45s var(--k-spring),background .3s}
+.favorite-button:active,.cart-add:active{transform:scale(.8)}
+
+/* =====================================================
+   3. KONTROL TERSEGMENTASI (lensa bergeser)
+   ===================================================== */
+.k-seg{position:relative;isolation:isolate}
+.k-thumb{position:absolute;top:0;left:0;z-index:0;border-radius:999px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(236,228,252,.92));box-shadow:0 6px 16px rgba(10,4,30,.25),inset 0 1px 0 #fff,inset 0 -1px 2px rgba(120,90,180,.15);transition:transform .55s var(--k-spring),width .45s var(--k-spring),height .3s,opacity .3s}
+
+
+[data-theme=light] .k-thumb{background:linear-gradient(180deg,#2f2550,#241b3c);box-shadow:0 6px 16px rgba(60,30,110,.3),inset 0 1px 0 rgba(255,255,255,.2)}
+.k-seg>button,.k-seg>.filter-pill{position:relative;z-index:1;background:transparent!important;box-shadow:none!important;border-color:transparent!important;transition:color .35s}
+.k-seg>button.on,.k-seg>.filter-pill.active{color:#171323!important;font-weight:700}
+[data-theme=light] .k-seg>button.on,[data-theme=light] .k-seg>.filter-pill.active{color:#fff!important}
+.chip-select.k-seg{gap:4px;padding:4px;border-radius:22px;background:var(--k-fill)}
+.chip-select.k-seg .k-thumb{border-radius:16px}
+
+/* =====================================================
+   4. TAB BAR HP (mengecil saat digulir)
+   ===================================================== */
+@media (max-width:820px){
+  .mobile-nav{transition:transform .6s var(--k-spring),padding .4s,box-shadow .4s;transform-origin:left bottom;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 18px 44px rgba(6,2,20,.45)}
+  .mobile-nav .nav-lens{border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.1));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 1px rgba(255,255,255,.12),0 6px 16px rgba(0,0,0,.25);transition:transform .6s var(--k-spring),width .5s var(--k-spring)}
+  [data-theme=light] .mobile-nav .nav-lens{background:linear-gradient(180deg,#fff,rgba(255,255,255,.75));box-shadow:0 6px 16px rgba(80,40,140,.18)}
+  .mobile-nav a small,.mobile-nav button small{transition:opacity .3s,max-height .4s var(--k-ease),margin .4s}
+  html.k-min .mobile-nav{transform:scale(.88) translateY(4px)}
+  html.k-min .mobile-nav a small{max-height:0;opacity:0;margin:0;overflow:hidden}
+  .mobile-nav a.is-active span{transform:scale(1.12);transition:transform .5s var(--k-spring)}
+}
+
+/* =====================================================
+   5. POP UP SUKA BARU
+   ===================================================== */
+.bbx-like{display:none!important}
+.k-like-bd{--ox:0px;--oy:120px;position:fixed;inset:0;z-index:905;display:grid;place-items:center;padding:18px;background:rgba(8,5,18,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);transition:background .5s,backdrop-filter .5s,-webkit-backdrop-filter .5s}
+.k-like-bd.in{background:rgba(8,5,18,.38);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+[data-theme=light] .k-like-bd.in{background:rgba(236,226,255,.45)}
+.k-like-bd.out{background:rgba(8,5,18,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0)}
+.k-like{--rx:0deg;--ry:0deg;--gx:30%;position:relative;width:min(360px,100%);padding:10px 10px 14px;border-radius:38px;color:var(--k-ink);background:var(--k-panel);-webkit-backdrop-filter:blur(44px) saturate(210%) brightness(1.06);backdrop-filter:blur(44px) saturate(210%) brightness(1.06);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.08),0 44px 110px rgba(4,2,14,.55);
+  opacity:0;transform:translate(var(--ox),var(--oy)) scale(.18);border-radius:50%;filter:blur(6px);
+  transition:transform .75s var(--k-spring),opacity .35s,border-radius .6s var(--k-ease),filter .5s}
+.k-like-bd.in .k-like{opacity:1;transform:perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));border-radius:38px;filter:none}
+.k-like-bd.out .k-like{opacity:0;transform:scale(.9) translateY(14px);filter:blur(8px);transition:transform .4s var(--k-ease),opacity .3s,filter .3s}
+.k-like::before{content:"";position:absolute;inset:0;z-index:4;border-radius:inherit;padding:1px;background:linear-gradient(calc(140deg + var(--k-tx) * 30deg),rgba(255,255,255,.85),rgba(255,255,255,.1) 30%,rgba(255,255,255,.02) 55%,rgba(255,255,255,.35) 85%,rgba(255,255,255,.7));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.k-like-media{position:relative;height:210px;overflow:hidden;border-radius:30px;background:#211a33}
+.k-like-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.15);animation:kKen 5s var(--k-ease) forwards}
+@keyframes kKen{to{transform:scale(1.02)}}
+.k-like-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(16,10,30,.75))}
+.k-like-glare{position:absolute;inset:0;z-index:1;background:radial-gradient(220px circle at var(--gx) 0%,rgba(255,255,255,.35),transparent 60%);mix-blend-mode:soft-light;pointer-events:none}
+.k-close{position:absolute;top:10px;right:10px;z-index:3;display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:50%;color:#fff;background:rgba(20,14,34,.35);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);cursor:pointer;transition:transform .45s var(--k-spring)}
+.k-close:hover{transform:scale(1.1)}
+.k-close .k-ic{width:15px;height:15px}
+.k-ring{position:absolute;inset:0;transform:rotate(-90deg)}
+.k-ring circle{fill:none;stroke:rgba(255,255,255,.85);stroke-width:2;stroke-linecap:round;stroke-dasharray:101;stroke-dashoffset:0;animation:kRing linear forwards}
+.k-like-bd.paused .k-ring circle{animation-play-state:paused}
+@keyframes kRing{to{stroke-dashoffset:101}}
+.k-like-heart{position:relative;z-index:3;display:grid;place-items:center;width:74px;height:74px;margin:-40px auto 0;border-radius:50%;background:linear-gradient(145deg,rgba(255,255,255,.3),rgba(255,255,255,.08));-webkit-backdrop-filter:blur(20px) saturate(200%);backdrop-filter:blur(20px) saturate(200%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.7),0 14px 34px rgba(255,61,130,.4);animation:kHeartIn .9s .25s var(--k-spring) both}
+.k-hfill{width:34px;height:34px;fill:#ff3d82;stroke:#fff;stroke-width:1.2;filter:drop-shadow(0 4px 10px rgba(255,61,130,.6));animation:kBeat 1.4s 1.2s ease-in-out infinite}
+@keyframes kHeartIn{0%{transform:scale(0) rotate(-25deg)}60%{transform:scale(1.18) rotate(6deg)}100%{transform:none}}
+@keyframes kBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.16)}28%{transform:scale(1)}42%{transform:scale(1.1)}}
+.k-wave{position:absolute;inset:0;border:2px solid rgba(255,95,168,.6);border-radius:50%;opacity:0;animation:kWave 1.4s .45s ease-out forwards}
+.k-wave.w2{animation-delay:.7s;border-color:rgba(176,108,255,.5)}
+@keyframes kWave{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.1);opacity:0}}
+.k-burst{position:absolute;left:50%;top:50%}
+.k-burst i{position:absolute;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:var(--c);opacity:0;animation:kSpark .8s .5s cubic-bezier(.15,.8,.3,1) forwards}
+@keyframes kSpark{0%{transform:translate(0,0) scale(.4);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1);opacity:0}}
+.k-like-body{padding:10px 12px 4px;text-align:center}
+.k-like-body small{color:#ff8cc3;font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;animation:kUp .6s .45s both}
+[data-theme=light] .k-like-body small{color:#c2418b}
+.k-like-body h3{margin:6px 0 4px;font-family:var(--heading,serif);font-size:1.75rem;font-weight:600;line-height:1.1;animation:kUp .6s .52s both}
+.k-like-body p{margin:0;color:var(--k-mute);font-size:.76rem;animation:kUp .6s .6s both}
+@keyframes kUp{from{opacity:0;transform:translateY(10px);filter:blur(4px)}}
+.k-like-stack{display:flex;justify-content:center;margin-top:12px;padding-left:10px;animation:kUp .6s .66s both}
+.k-like-stack img{width:30px;height:30px;margin-left:-10px;border:2px solid rgba(30,22,50,.9);border-radius:50%;object-fit:cover;animation:kPop .5s calc(.7s + var(--i) * .06s) var(--k-spring) both}
+[data-theme=light] .k-like-stack img{border-color:#fff}
+@keyframes kPop{from{transform:scale(0)}}
+.k-like-act{display:grid;grid-template-columns:1fr 1.5fr;gap:8px;padding:14px 4px 0;animation:kUp .6s .72s both}
+.k-cap{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:48px;padding:0 16px;border:0;border-radius:999px;font:600 .82rem var(--body,system-ui);cursor:pointer;transition:transform .45s var(--k-spring),filter .3s}
+.k-cap .k-ic{width:17px;height:17px}
+.k-cap.tint{color:#fff;background:var(--k-tint);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 12px 28px rgba(255,95,168,.35)}
+.k-cap.tint .k-ic{fill:#fff;stroke:none}
+.k-cap.ghost{color:var(--k-ink);background:var(--k-fill2);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.k-cap:hover{filter:brightness(1.08)}
+
+/* Pulau notifikasi "Dihapus" + Urungkan */
+.k-island{position:fixed;top:max(12px,env(safe-area-inset-top));left:50%;z-index:960;display:flex;align-items:center;gap:10px;min-width:min(340px,calc(100vw - 24px));padding:7px 7px 7px 7px;border-radius:999px;color:#fff;background:rgba(10,8,18,.92);box-shadow:0 18px 44px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.07);opacity:0;transform:translate(-50%,-30px) scale(.6,.5);transition:transform .6s var(--k-spring),opacity .3s}
+.k-island.in{opacity:1;transform:translate(-50%,0)}
+.k-island img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.k-island div{display:grid;flex:1;min-width:0;line-height:1.25}
+.k-island b{font-size:.78rem}
+.k-island small{overflow:hidden;color:#bdb6d4;font-size:.68rem;white-space:nowrap;text-overflow:ellipsis}
+.k-undo{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:0;border-radius:999px;color:#171323;background:#fff;font:700 .72rem var(--body,system-ui);cursor:pointer;transition:transform .4s var(--k-spring)}
+.k-undo .k-ic{width:15px;height:15px}
+.k-undo:active{transform:scale(.9)}
+.k-island.done .k-undo{opacity:0;pointer-events:none;width:0;padding:0;overflow:hidden}
+
+/* =====================================================
+   6. DETAIL PRODUK — lebih pas, liquid glass
+   ===================================================== */
+.modal-backdrop{background:rgba(8,5,18,.45);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+[data-theme=light] .modal-backdrop{background:rgba(236,226,255,.5)}
+.glass.detail-modal.k-detail{display:flex;width:min(980px,100%);max-height:min(90dvh,740px);padding:0;overflow:hidden;border-radius:40px;background:var(--k-panel);-webkit-backdrop-filter:blur(44px) saturate(210%) brightness(1.05);backdrop-filter:blur(44px) saturate(210%) brightness(1.05);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),0 50px 120px rgba(4,2,14,.6)}
+.k-detail #detailContent{flex:1;min-width:0;display:flex}
+.k-detail .detail-layout{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;min-height:0}
+.k-detail .detail-layout>div:first-child{position:relative;display:flex;flex-direction:column;gap:10px;min-height:0;padding:12px}
+.k-detail .detail-main-image{flex:1;width:100%;height:100%;min-height:0;max-height:none;aspect-ratio:auto;border-radius:30px;box-shadow:0 18px 40px rgba(0,0,0,.35);transition:transform .8s var(--k-ease)}
+.k-detail .detail-main-image:hover{transform:scale(1.015)}
+.k-detail .detail-thumbs{position:absolute;bottom:24px;left:24px;margin:0}
+.k-detail .detail-thumb{width:48px;height:48px;border:2px solid rgba(255,255,255,.7);border-radius:14px;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.k-detail .detail-copy{display:flex;flex-direction:column;min-height:0;max-height:min(90dvh,740px);overflow-y:auto;padding:70px 30px 0 22px;scrollbar-width:none}
+.k-detail .detail-copy::-webkit-scrollbar{display:none}
+.k-detail .detail-copy h2{margin:10px 0 10px;font-family:var(--heading,serif);font-size:clamp(2rem,3.4vw,2.7rem);font-weight:600;line-height:1.02;letter-spacing:-.5px}
+.k-detail .detail-copy p{margin:0 0 10px;line-height:1.7}
+.k-detail .detail-tags span{padding:5px 11px;border-radius:999px;background:var(--k-fill2);font-size:.64rem;font-weight:600}
+.k-detail .detail-price{display:inline-flex;align-self:flex-start;margin:6px 0 4px;padding:9px 14px;border-radius:16px;background:linear-gradient(120deg,rgba(255,140,195,.16),rgba(185,160,255,.14));font-size:.84rem}
+.k-detail .detail-related{margin:18px 0 6px}
+.k-detail .detail-related button{width:70px;height:80px;border-radius:18px;transition:transform .45s var(--k-spring)}
+.k-detail .detail-related button:hover{transform:translateY(-3px) scale(1.04)}
+.k-detail .detail-copy .detail-actions{order:9;position:sticky;bottom:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:auto -30px 0 -22px;padding:14px 30px 18px 22px;border-radius:0;background:linear-gradient(180deg,rgba(30,22,50,0),rgba(30,22,50,.75) 28%);-webkit-backdrop-filter:none;backdrop-filter:none}
+[data-theme=light] .k-detail .detail-copy .detail-actions{background:linear-gradient(180deg,rgba(255,255,255,0),rgba(250,246,255,.9) 28%)}
+.k-detail .detail-actions .button{width:100%;min-height:44px;padding:8px 10px;border-radius:999px;font-size:.7rem;line-height:1.2;white-space:normal}
+.k-detail .detail-actions .k-act-main{grid-column:1/-1;min-height:52px;font-size:.86rem;color:#fff;background:linear-gradient(120deg,#1fbf75,#18a0a0);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px rgba(31,191,117,.3)}
+.k-detail .detail-actions .k-act-sub{background:var(--k-fill2);border:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.k-detail-tools{position:absolute;top:14px;right:14px;z-index:5;display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;background:rgba(255,255,255,.1);-webkit-backdrop-filter:blur(20px) saturate(190%);backdrop-filter:blur(20px) saturate(190%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 20px rgba(0,0,0,.2)}
+[data-theme=light] .k-detail-tools{background:rgba(255,255,255,.7)}
+.k-detail-tools>button{position:static!important;width:38px!important;height:38px!important;margin:0!important;border:0!important;border-radius:50%!important;background:transparent!important;color:var(--k-ink)!important;font-size:1.2rem}
+.k-detail-tools>button:hover{background:rgba(255,255,255,.14)!important}
+.k-detail-tools>.modal-close{background:rgba(255,255,255,.14)!important}
+.k-grab{display:none}
+
+/* =====================================================
+   7. LEMBAR KERANJANG / PESAN CUSTOM / UCAPAN
+   ===================================================== */
+.k-sheet{width:min(580px,100%);padding:10px 18px 22px;border-radius:38px;background:var(--k-panel)!important;-webkit-backdrop-filter:blur(44px) saturate(210%) brightness(1.05)!important;backdrop-filter:blur(44px) saturate(210%) brightness(1.05)!important;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),0 50px 120px rgba(4,2,14,.55)}
+.k-sheet .seg{padding:4px;border-radius:999px;background:var(--k-fill2);box-shadow:inset 0 1px 2px rgba(0,0,0,.18)}
+.k-sheet .seg button{min-height:38px;font-weight:600;color:var(--k-ink)}
+.k-hide{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.k-pane-head{display:flex;align-items:center;gap:12px;margin:4px 0 8px}
+.k-pane-head h4{margin:0;font-family:var(--heading,serif);font-size:1.35rem;font-weight:600}
+.k-pane-head p{margin:2px 0 0;color:var(--k-mute);font-size:.72rem}
+.k-pane-ic{display:grid;place-items:center;flex-shrink:0;width:42px;height:42px;border-radius:14px;color:#fff;background:linear-gradient(135deg,#ff6fae,#ff3d82);font-size:1.1rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px rgba(255,61,130,.35)}
+.k-pane-ic.violet{background:linear-gradient(135deg,#b48cff,#7a4fd6);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px rgba(122,79,214,.35)}
+.k-form label{margin:14px 2px 6px!important;color:var(--k-mute)!important;font-size:.68rem!important;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.k-form :is(input,textarea,select){min-height:48px;padding:13px 16px!important;border:1px solid transparent!important;border-radius:18px!important;color:var(--k-ink)!important;background:var(--k-fill)!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.15);font:500 .9rem var(--body,system-ui)!important;transition:background .3s,box-shadow .3s,border-color .3s}
+.k-form :is(input,textarea):focus{border-color:rgba(255,140,195,.5)!important;background:var(--k-fill2)!important;box-shadow:0 0 0 4px rgba(255,140,195,.15)!important}
+.k-form textarea{resize:none;line-height:1.5}
+.k-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.k-chips.small{margin-top:8px}
+.k-chips button{min-height:36px;padding:0 14px;border:1px solid var(--k-edge);border-radius:999px;color:var(--k-ink);background:var(--k-fill);font:600 .74rem var(--body,system-ui);cursor:pointer;transition:background .35s,color .3s,border-color .3s,transform .45s var(--k-spring)}
+.k-chips.small button{min-height:30px;padding:0 11px;font-size:.68rem}
+.k-chips button:hover{background:var(--k-fill2)}
+.k-chips button.on{border-color:transparent;color:#fff;background:var(--k-tint);box-shadow:0 8px 18px rgba(255,95,168,.3),inset 0 1px 0 rgba(255,255,255,.4)}
+.k-help{display:block;margin:6px 4px 0;color:var(--k-mute);font-size:.68rem}
+.k-help.right{text-align:right}
+.k-preview{margin-top:16px;padding:12px;border-radius:24px;background:linear-gradient(160deg,rgba(14,60,50,.35),rgba(20,30,40,.35));box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+[data-theme=light] .k-preview{background:linear-gradient(160deg,#e7f6ee,#eef4f8)}
+.k-pv-top{display:flex;align-items:center;gap:7px;margin:0 4px 10px;font-size:.74rem}
+.k-pv-top .k-ic{width:16px;height:16px;color:#25d366}
+.k-pv-top small{margin-left:auto;color:var(--k-mute);font-size:.64rem}
+.k-bubble{position:relative;margin-left:auto;max-width:92%;padding:10px 12px 18px;border-radius:18px 18px 4px 18px;color:#e9fdf2;background:linear-gradient(160deg,#0f6b55,#0b5847);box-shadow:0 6px 16px rgba(0,0,0,.25)}
+[data-theme=light] .k-bubble{color:#0b2a20;background:#d9fdd3}
+.k-bubble p{margin:0;font-size:.74rem;line-height:1.5;white-space:pre-wrap}
+.k-bubble time{position:absolute;right:10px;bottom:4px;opacity:.7;font-size:.58rem}
+.k-quote{position:relative;padding:18px 16px 14px!important;border:1px solid var(--k-edge);border-radius:24px!important;background:var(--k-glass)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.2);animation:kUp .35s calc(var(--i,0) * .05s) var(--k-ease) both}
+.k-quote::before{content:"“";position:absolute;top:-6px;left:12px;font-family:var(--heading,serif);font-size:3rem;line-height:1;background:var(--k-tint);-webkit-background-clip:text;background-clip:text;color:transparent}
+.k-quote p{margin:6px 0 12px!important;font-family:var(--heading,serif);font-size:1.12rem;font-style:italic;line-height:1.4}
+.k-mini{display:inline-flex!important;align-items:center;gap:6px;min-height:34px;padding:0 13px!important;border:0!important;border-radius:999px!important;color:var(--k-ink)!important;background:var(--k-fill2)!important;font:600 .7rem var(--body,system-ui)!important;cursor:pointer;transition:transform .4s var(--k-spring),background .3s}
+.k-mini .k-ic{width:14px;height:14px}
+.k-mini.tint{color:#fff!important;background:var(--k-tint)!important}
+.k-mini.ok{color:#fff!important;background:#1fbf75!important}
+.k-sheet #cSend,.k-sheet #cartSend{min-height:52px;border-radius:999px;color:#fff;background:linear-gradient(120deg,#1fbf75,#18a0a0);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px rgba(31,191,117,.3)}
+
+/* =====================================================
+   8. HP
+   ===================================================== */
+@media (max-width:700px){
+  /* detail produk jadi lembar bawah */
+  .modal-backdrop{align-items:end;padding:0!important}
+  .glass.detail-modal.k-detail{display:block;width:100%;max-height:94dvh;overflow-y:auto;border-radius:34px 34px 0 0;animation:kSheetUp .6s cubic-bezier(.2,1.05,.3,1) both;scrollbar-width:none}
+  .k-detail #detailContent{display:block}
+  .k-detail .detail-layout{display:block}
+  .k-detail .detail-layout>div:first-child{padding:8px 8px 0}
+  .k-detail .detail-main-image{height:auto;max-height:56dvh;aspect-ratio:4/5;border-radius:28px}
+  .k-detail .detail-thumbs{bottom:14px;left:20px}
+  .k-detail .detail-copy{max-height:none;overflow:visible;padding:18px 18px 0}
+  .k-detail .detail-copy h2{font-size:2.1rem}
+  .k-detail .detail-copy .detail-actions{margin:14px -18px 0;padding:12px 14px calc(14px + env(safe-area-inset-bottom));grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .k-detail .detail-actions .button{min-height:42px;padding:6px 6px;font-size:.62rem}
+  .k-detail .detail-actions .k-act-main{font-size:.82rem}
+  .k-grab{position:sticky;top:0;z-index:6;display:block;width:42px;height:5px;margin:8px auto -13px;border-radius:9px;background:rgba(255,255,255,.55);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  @keyframes kSheetUp{from{transform:translateY(100%)}to{transform:none}}
+
+  .k-sheet{border-radius:34px 34px 0 0;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+  .k-like-media{height:180px}
+}
+@media (max-width:700px){
+  .k-detail-tools{top:22px;right:18px}
+}
+
+/* Gerak dikurangi */
+@media (prefers-reduced-motion:reduce){
+  .k-like,.k-thumb,.mobile-nav,.site-header{transition:none!important}
+  .k-jelly{animation:none}
+}
+html[data-motion=reduce] .k-jelly{animation:none}
+
+/* Lingkaran cahaya lama di lembar keranjang diganti bingkai kaca biasa */
+.bbx-cart .sheet.k-sheet::before{inset:0;top:0;right:0;width:auto;height:auto;border-radius:inherit;background:linear-gradient(145deg,rgba(255,255,255,.7),rgba(255,255,255,.1) 30%,rgba(255,255,255,.02) 55%,rgba(255,255,255,.3) 85%,rgba(255,255,255,.55));animation:none}

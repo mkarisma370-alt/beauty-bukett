@@ -1,0 +1,967 @@
+
+/* 1. Variabel tema galaksi silver */
+:root {
+  --silver: #d9dbe7;
+  --silver-bright: #f5f4fa;
+  --ink: #f8f6ff;
+  --muted: #b9b5c9;
+  --rose: #efb8d3;
+  --violet: #b5a2ff;
+  --line: rgba(255,255,255,.16);
+  --glass: rgba(255,255,255,.075);
+  --glass-strong: rgba(255,255,255,.12);
+  --dark: #11101b;
+  --heading: "Playfair Display", Georgia, serif;
+  --body: "DM Sans", Arial, sans-serif;
+  --ease: cubic-bezier(.2,.75,.2,1);
+  --shadow: 0 24px 80px rgba(0,0,0,.22);
+}
+
+/* 2. Reset dan fondasi */
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--ink);
+  background: var(--dark);
+  font-family: var(--body);
+  line-height: 1.65;
+}
+
+body.lock-scroll { overflow: hidden; }
+
+a { color: inherit; text-decoration: none; }
+button, input, select { font: inherit; }
+button { color: inherit; }
+img { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
+
+button:focus-visible, a:focus-visible,
+input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 4px;
+}
+
+button { -webkit-tap-highlight-color: transparent; }
+
+.section-shell {
+  position: relative;
+  width: min(1120px, calc(100% - 48px));
+  margin-inline: auto;
+  padding-block: 110px;
+}
+
+h1, h2, h3, p { margin-top: 0; }
+
+h1, h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -.8px;
+}
+
+h1 em, h2 em {
+  color: var(--rose);
+  font-weight: 500;
+}
+
+/* 3. Latar aurora berlapis */
+.aurora-background {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, #30203d 0%, transparent 55%),
+    linear-gradient(160deg, #11101b, #171329 55%, #101522);
+}
+
+.aurora {
+  position: absolute;
+  width: 65vw;
+  height: 65vw;
+  min-width: 400px;
+  min-height: 400px;
+  border-radius: 50%;
+  opacity: .32;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+.aurora-one {
+  top: -20%;
+  left: -20%;
+  background: radial-gradient(circle, #8c55d7, #6037a1 35%, transparent 70%);
+  animation: aurora-drift-one 24s ease-in-out infinite alternate;
+}
+
+.aurora-two {
+  top: 25%;
+  right: -25%;
+  background: radial-gradient(circle, #267ca7, #4653a0 35%, transparent 72%);
+  animation: aurora-drift-two 29s ease-in-out infinite alternate;
+}
+
+.aurora-three {
+  bottom: -35%;
+  left: 15%;
+  background: radial-gradient(circle, #a34e91, #754bba 38%, transparent 72%);
+  animation: aurora-drift-three 32s ease-in-out infinite alternate;
+}
+
+.star-field {
+  position: absolute;
+  inset: 0;
+  opacity: .27;
+  background-image:
+    radial-gradient(1px 1px at 12% 19%, white 99%, transparent),
+    radial-gradient(2px 2px at 31% 67%, white 99%, transparent),
+    radial-gradient(1px 1px at 76% 21%, white 99%, transparent),
+    radial-gradient(1px 1px at 89% 61%, white 99%, transparent),
+    radial-gradient(2px 2px at 55% 44%, white 99%, transparent),
+    radial-gradient(1px 1px at 22% 88%, white 99%, transparent),
+    radial-gradient(1px 1px at 67% 84%, white 99%, transparent),
+    radial-gradient(1px 1px at 44% 12%, white 99%, transparent);
+  background-size: 320px 320px;
+  animation: stars-twinkle 8s ease-in-out infinite alternate;
+}
+
+/* 4. Liquid glass */
+.glass {
+  border: 1px solid var(--line);
+  background: var(--glass);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 12px 45px rgba(0,0,0,.09);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+}
+
+.scroll-progress {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 300;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #a5d8ff, #d6b7ff, #f4b9d6);
+}
+
+/* 5. Header dan logo */
+.site-header {
+  position: sticky;
+  top: 12px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: min(1160px, calc(100% - 36px));
+  min-height: 76px;
+  margin: 12px auto 0;
+  padding: 12px 18px;
+  border-radius: 23px;
+  transition: background .3s var(--ease), border-color .3s var(--ease);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-logo-wrap {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid #ffffff38;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #ffffff1c, #ffffff05);
+}
+
+.brand-logo { width: 100%; height: 100%; object-fit: contain; }
+
+.brand-text { display: flex; flex-direction: column; line-height: 1.4; }
+.brand-text strong { font-size: .76rem; letter-spacing: 1.4px; }
+.brand-text small { margin-top: 3px; color: var(--muted); font-size: .51rem; letter-spacing: 1px; }
+
+.desktop-nav { display: flex; align-items: center; gap: 28px; }
+.desktop-nav a { color: var(--muted); font-size: .79rem; transition: color .25s; }
+.desktop-nav a:hover { color: white; }
+
+.header-actions { display: flex; gap: 8px; }
+
+.glass-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #ffffff09;
+  cursor: pointer;
+  transition: transform .25s var(--ease), background .25s;
+}
+
+.glass-icon:hover { transform: translateY(-2px); background: #ffffff18; }
+.glass-icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+
+.count-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 20px;
+  color: #171323;
+  background: var(--rose);
+  font-size: .61rem;
+}
+
+/* 6. Pembuka tanpa foto besar */
+.hero {
+  position: relative;
+  display: grid;
+  min-height: min(820px, calc(100svh - 85px));
+  place-items: center;
+  padding: 65px 24px 60px;
+  overflow: hidden;
+}
+
+.hero-content {
+  width: min(750px, 100%);
+  margin: auto;
+  text-align: center;
+  animation: hero-appear 1.2s var(--ease) both;
+}
+
+.welcome-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  color: #e7e1f5;
+  font-size: .71rem;
+  letter-spacing: .5px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #b8f2d0;
+  box-shadow: 0 0 15px #a0f0c0;
+  animation: dot-pulse 2.4s infinite;
+}
+
+.hero-logo-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 205px;
+  height: 205px;
+  margin: 30px auto 24px;
+}
+
+.logo-halo {
+  position: absolute;
+  inset: 15px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #8f6bff50, #72c7ff40, #ffb9df55, #8f6bff50);
+  filter: blur(28px);
+  animation: halo-breathe 6s ease-in-out infinite;
+}
+
+.logo-ring {
+  position: absolute;
+  border: 1px solid #ffffff26;
+  border-radius: 50%;
+}
+
+.ring-one {
+  inset: 0;
+  border-top-color: #d8b9ffb0;
+  border-right-color: #9fd9ff70;
+  animation: ring-rotate 22s linear infinite;
+}
+
+.ring-two {
+  inset: 12px;
+  border-bottom-color: #f5bce2b0;
+  border-left-color: #b8cfff85;
+  animation: ring-rotate 28s linear infinite reverse;
+}
+
+.hero-logo-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 130px;
+  height: 130px;
+  overflow: hidden;
+  padding: 14px;
+  border-radius: 36px;
+  background: linear-gradient(145deg, #ffffff20, #ffffff06);
+  box-shadow: 0 20px 60px #00000020, inset 0 1px #ffffff38;
+  animation: logo-float 6s ease-in-out infinite;
+}
+
+.hero-logo { width: 100%; height: 100%; object-fit: contain; }
+
+.orbit-spark {
+  position: absolute;
+  color: #e9caff;
+  text-shadow: 0 0 18px #e4b7ff8c;
+}
+
+.spark-one { top: 18px; right: 15px; font-size: 1.3rem; animation: spark-float 5s infinite; }
+.spark-two { bottom: 27px; left: 3px; font-size: 1.4rem; animation: spark-float 6s -2s infinite; }
+.spark-three { right: 0; bottom: 37px; font-size: .9rem; animation: spark-float 7s -1s infinite; }
+
+.hero-overline {
+  margin: 0 0 16px;
+  color: #c8b9e7;
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(3rem, 7.2vw, 5.9rem);
+  letter-spacing: -2.5px;
+}
+
+.hero h1 em {
+  color: transparent;
+  background: linear-gradient(100deg, #e5d7ff, #a9ddff 48%, #ffc7e6);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.hero-description {
+  max-width: 490px;
+  margin: 23px auto 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 47px;
+  padding: 12px 19px;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .3s var(--ease), box-shadow .3s, background .3s;
+}
+
+.button:hover { transform: translateY(-3px); }
+
+.button-light {
+  color: #171323;
+  background: linear-gradient(110deg, #fff, #ded6f3);
+  box-shadow: 0 8px 30px #c7b5ff20;
+}
+
+.button-light:hover { box-shadow: 0 12px 38px #c7b5ff36; }
+
+.button-outline {
+  border-color: var(--line);
+  background: #ffffff09;
+}
+
+.hero-text-link { color: #e2dbea; font-size: .8rem; }
+.hero-text-link span { margin-left: 5px; }
+
+.hero-bottom-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  margin-top: 52px;
+  color: #9b96b1;
+  font-size: .55rem;
+  letter-spacing: 1.7px;
+}
+
+.note-line { width: 35px; height: 1px; background: #ffffff38; }
+
+.scroll-cue {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  display: grid;
+  place-items: start center;
+  width: 22px;
+  height: 34px;
+  padding-top: 7px;
+  border: 1px solid #ffffff45;
+  border-radius: 20px;
+  transform: translateX(-50%);
+}
+
+.scroll-cue span {
+  width: 3px;
+  height: 7px;
+  border-radius: 4px;
+  background: #e5d7ff;
+  animation: scroll-cue 1.8s infinite;
+}
+
+/* 7. Heading koleksi dan pencarian */
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  color: #d3b8ff;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: 2.3px;
+}
+
+.section-heading h2, .about-copy h2 {
+  margin: 12px 0;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+}
+
+.section-heading p, .about-copy p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.product-count { flex-shrink: 0; color: #e9d9ff; }
+.product-count span { font-size: 1.6rem; font-family: var(--heading); }
+.product-count small { color: var(--muted); font-size: .6rem; letter-spacing: 1.4px; }
+
+.catalog-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  min-height: 53px;
+  padding: 0 15px;
+  border-radius: 16px;
+  transition: border-color .25s, background .25s;
+}
+
+.catalog-search:focus-within { border-color: #d3b8ff80; background: #ffffff0d; }
+.catalog-search svg { width: 19px; height: 19px; fill: none; stroke: #c9bde0; stroke-width: 1.5; }
+.catalog-search input { width: 100%; min-width: 0; padding: 13px 0; border: 0; outline: 0; color: white; background: transparent; font-size: .82rem; }
+.catalog-search input::placeholder { color: #9791ab; }
+.catalog-search button { border: 0; background: transparent; color: white; font-size: 1.4rem; cursor: pointer; }
+
+.catalog-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin: 23px 0;
+}
+
+.filter-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.filter-pill {
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: #ffffff05;
+  font-size: .73rem;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.filter-pill:hover { color: white; background: #ffffff0d; }
+.filter-pill.active { color: #171323; border-color: #e6d9ff; background: linear-gradient(110deg, #f4eaff, #c9e6ff); }
+
+.sort-wrap { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .72rem; }
+.sort-wrap select { max-width: 130px; padding: 8px 9px; border: 1px solid var(--line); border-radius: 10px; color: white; background: #201c30; font-size: .72rem; }
+.sort-wrap option { color: white; background: #201c30; }
+
+/* 8. Kartu produk */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #ffffff14;
+  border-radius: 23px;
+  background: linear-gradient(145deg, #ffffff0d, #ffffff04);
+  box-shadow: 0 10px 40px #0000000b;
+  animation: card-appear .65s var(--ease) both;
+  transition: transform .4s var(--ease), border-color .4s, box-shadow .4s;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  border-color: #e2d0ff50;
+  box-shadow: 0 22px 60px #00000028;
+}
+
+.product-media { position: relative; overflow: hidden; background: #262238; }
+.product-image { width: 100%; aspect-ratio: 4 / 4.5; object-fit: cover; transition: transform .8s var(--ease); }
+.product-card:hover .product-image { transform: scale(1.045); }
+
+.product-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 10px;
+  border: 1px solid #ffffff2b;
+  border-radius: 999px;
+  color: #f5efff;
+  background: #1814259c;
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  font-size: .59rem;
+}
+
+.favorite-button {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  border: 1px solid #ffffff35;
+  border-radius: 50%;
+  color: white;
+  background: #1814259c;
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform .25s, color .25s;
+}
+
+.favorite-button:hover { transform: scale(1.08); }
+.favorite-button.is-favorite { color: #ffafd4; }
+
+.quick-view {
+  position: absolute;
+  right: 11px;
+  bottom: 11px;
+  left: 11px;
+  padding: 11px;
+  border: 1px solid #ffffff48;
+  border-radius: 13px;
+  color: white;
+  background: #171323b8;
+  -webkit-backdrop-filter: blur(17px);
+  backdrop-filter: blur(17px);
+  font-size: .73rem;
+  cursor: pointer;
+  transition: background .25s;
+}
+
+.quick-view:hover { background: #302545e8; }
+
+.product-info { padding: 17px; }
+.product-title-row { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.product-title { margin: 0; font-family: var(--heading); font-size: 1.2rem; font-weight: 500; line-height: 1.35; }
+.product-number { color: #8d86a6; font-size: .62rem; letter-spacing: 1px; }
+.product-description { min-height: 43px; margin: 9px 0 11px; color: var(--muted); font-size: .75rem; }
+.product-price { margin: 0 0 14px; color: #e9c5f3; font-size: .76rem; font-weight: 700; }
+.product-actions { display: flex; gap: 8px; }
+.product-actions .button { flex: 1; min-width: 0; min-height: 40px; padding: 9px 8px; font-size: .69rem; }
+.button-glass { border-color: var(--line); background: #ffffff08; }
+
+/* 9. Tampilan kosong dan riwayat */
+.empty-state { margin-top: 20px; padding: 40px 20px; border-radius: 22px; text-align: center; }
+.empty-state > span { color: var(--rose); font-size: 2.5rem; }
+.empty-state h3 { margin: 7px 0; font-family: var(--heading); font-size: 1.6rem; }
+.empty-state p { color: var(--muted); font-size: .82rem; }
+
+.recent-section { margin-top: 58px; padding-top: 24px; border-top: 1px solid var(--line); }
+.recent-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.recent-heading h3 { font-family: var(--heading); font-size: 1.4rem; font-weight: 500; }
+.subtle-button { border: 0; color: var(--muted); background: transparent; font-size: .73rem; cursor: pointer; }
+.recent-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: #ffffff07;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recent-item img { width: 52px; height: 58px; flex-shrink: 0; border-radius: 9px; object-fit: cover; }
+.recent-item strong { display: block; font-size: .74rem; }
+
+/* 10. Tentang usaha */
+.about-section { padding-top: 25px; }
+.about-glass {
+  display: grid;
+  grid-template-columns: .7fr 1fr;
+  align-items: center;
+  gap: 65px;
+  padding: 55px;
+  border-radius: 30px;
+  background: linear-gradient(125deg, #ffffff0c, #a28ce51a, #ffffff04);
+}
+
+.about-emblem {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 230px;
+  height: 230px;
+  margin: auto;
+  border: 1px solid #ffffff25;
+  border-radius: 50%;
+  background: radial-gradient(circle, #d5c3ff15, transparent 68%);
+}
+
+.about-emblem img { position: relative; z-index: 1; width: 120px; height: 120px; object-fit: contain; }
+.emblem-orbit { position: absolute; inset: 12px; border: 1px solid #ffffff1e; border-radius: 50%; }
+.about-copy h2 { margin-bottom: 18px; }
+.about-copy p { max-width: 500px; margin-bottom: 25px; line-height: 1.9; }
+
+/* 11. Kontak */
+.contact-section { padding-top: 70px; }
+.contact-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 17px 15px;
+  border-radius: 18px;
+  transition: transform .3s var(--ease), border-color .3s, background .3s;
+}
+
+.contact-card:hover { transform: translateY(-4px); border-color: #e5cfff55; background: #ffffff10; }
+.contact-symbol { display: grid; place-items: center; width: 41px; height: 41px; flex-shrink: 0; border: 1px solid var(--line); border-radius: 14px; color: #e6c8ff; font-size: 1.1rem; }
+.contact-copy { flex: 1; min-width: 0; }
+.contact-copy small, .contact-copy strong { display: block; }
+.contact-copy small { color: var(--muted); font-size: .57rem; letter-spacing: 1.3px; }
+.contact-copy strong { font-size: .79rem; overflow-wrap: anywhere; }
+.contact-arrow { color: #e6c8ff; }
+
+/* 12. Footer */
+.site-footer { padding: 26px 0 90px; border-top: 1px solid #ffffff12; }
+.footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; width: min(1120px, calc(100% - 48px)); margin: auto; }
+.footer-inner p, .back-top { margin: 0; color: var(--muted); font-size: .7rem; }
+
+/* 13. Tombol WhatsApp */
+.floating-wa {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 17px;
+  border: 1px solid #b8f4d15c;
+  border-radius: 999px;
+  color: white;
+  background: #1b7954d9;
+  box-shadow: 0 10px 35px #00000028, inset 0 1px #ffffff25;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  font-size: .77rem;
+  font-weight: 700;
+  transition: transform .3s var(--ease);
+}
+
+.floating-wa:hover { transform: translateY(-4px); }
+
+/* 14. Modal detail */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: #070610b8;
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  animation: fade-in .22s both;
+}
+
+.detail-modal {
+  position: relative;
+  width: min(800px, 100%);
+  max-height: min(88dvh, 850px);
+  overflow-y: auto;
+  padding: 27px;
+  border-radius: 26px;
+  background: linear-gradient(145deg, #29243bfa, #171522fa);
+  box-shadow: var(--shadow);
+  animation: modal-appear .35s var(--ease) both;
+}
+
+.modal-close {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: white;
+  background: #ffffff0c;
+  font-size: 1.45rem;
+  cursor: pointer;
+}
+
+.detail-layout { display: grid; grid-template-columns: .95fr 1fr; gap: 28px; }
+.detail-main-image { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 18px; background: #29243b; }
+.detail-thumbs { display: flex; gap: 8px; margin-top: 10px; }
+.detail-thumb { width: 55px; height: 55px; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: #ffffff0b; cursor: pointer; }
+.detail-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.detail-copy { padding-top: 8px; }
+.detail-copy h2 { margin: 10px 0 15px; font-size: 2rem; }
+.detail-copy p { color: var(--muted); font-size: .84rem; }
+.detail-price { margin: 20px 0; color: #edc5f8; font-weight: 700; }
+.detail-actions { display: grid; gap: 10px; margin-top: 22px; }
+.detail-actions .button { width: 100%; }
+
+/* 15. Toast */
+.toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  z-index: 400;
+  max-width: calc(100% - 32px);
+  padding: 12px 18px;
+  border-radius: 14px;
+  color: white;
+  font-size: .79rem;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity .3s, transform .3s var(--ease);
+}
+
+.toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
+/* 16. Navigasi bawah HP */
+.mobile-nav { display: none; }
+
+/* 17. Gerakan galaksi dan transisi */
+@keyframes aurora-drift-one {
+  from { transform: translate3d(-5%, -3%, 0) rotate(0deg) scale(1); }
+  to { transform: translate3d(23%, 18%, 0) rotate(24deg) scale(1.18); }
+}
+
+@keyframes aurora-drift-two {
+  from { transform: translate3d(5%, -5%, 0) rotate(0deg) scale(1.05); }
+  to { transform: translate3d(-25%, 16%, 0) rotate(-25deg) scale(1.2); }
+}
+
+@keyframes aurora-drift-three {
+  from { transform: translate3d(-5%, 8%, 0) scale(1); }
+  to { transform: translate3d(20%, -18%, 0) scale(1.22); }
+}
+
+@keyframes stars-twinkle { from { opacity: .16; } to { opacity: .38; } }
+@keyframes dot-pulse { 50% { box-shadow: 0 0 0 6px #a0f0c015, 0 0 17px #a0f0c0; } }
+@keyframes halo-breathe { 50% { transform: scale(1.12); opacity: .7; } }
+@keyframes ring-rotate { to { transform: rotate(360deg); } }
+@keyframes logo-float { 50% { transform: translateY(-6px); } }
+@keyframes spark-float { 50% { transform: translateY(-9px) rotate(15deg); opacity: .6; } }
+@keyframes scroll-cue { 0%, 100% { transform: translateY(0); opacity: 1; } 60% { transform: translateY(10px); opacity: .15; } }
+@keyframes hero-appear { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes card-appear { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-appear { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* 18. Tablet */
+@media (max-width: 900px) {
+  .desktop-nav { gap: 15px; }
+  .site-header { gap: 12px; }
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-glass { gap: 30px; padding: 35px; }
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+/* 19. HP */
+@media (max-width: 640px) {
+  html { scroll-padding-top: 82px; }
+  .section-shell { width: calc(100% - 30px); padding-block: 72px; }
+
+  .site-header { top: 7px; width: calc(100% - 18px); min-height: 65px; margin-top: 7px; padding: 9px 11px; border-radius: 19px; }
+  .brand { gap: 7px; }
+  .brand-logo-wrap { width: 36px; height: 36px; border-radius: 12px; }
+  .brand-text strong { font-size: .65rem; letter-spacing: .8px; }
+  .brand-text small { font-size: .43rem; letter-spacing: .6px; }
+  .desktop-nav { display: none; }
+  .header-actions { gap: 5px; }
+  .glass-icon { width: 35px; height: 35px; border-radius: 12px; }
+
+  .hero { min-height: min(760px, calc(100svh - 65px)); padding: 54px 18px 55px; }
+  .hero-logo-stage { width: 172px; height: 172px; margin: 27px auto 24px; }
+  .hero-logo-card { width: 108px; height: 108px; border-radius: 29px; padding: 12px; }
+  .hero h1 { font-size: clamp(2.75rem, 11.2vw, 4rem); letter-spacing: -1.6px; }
+  .hero-description { max-width: 410px; font-size: .82rem; }
+  .hero-overline { font-size: .55rem; letter-spacing: 2px; }
+  .hero-bottom-note { margin-top: 37px; font-size: .47rem; letter-spacing: 1px; }
+  .hero-actions { gap: 17px; }
+  .scroll-cue { bottom: 10px; }
+
+  .section-heading { align-items: flex-start; gap: 12px; }
+  .section-heading h2, .about-copy h2 { font-size: clamp(2.3rem, 9.5vw, 3.2rem); }
+  .section-heading p { max-width: 320px; font-size: .79rem; }
+  .product-count { padding-top: 18px; }
+  .product-count span { font-size: 1.3rem; }
+
+  .catalog-tools { align-items: flex-start; flex-direction: column; }
+  .filter-pills { gap: 6px; }
+  .filter-pill { padding: 8px 11px; font-size: .68rem; }
+  .sort-wrap { align-self: flex-end; }
+
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+  .product-info { padding: 11px; }
+  .product-title { font-size: .98rem; }
+  .product-description { min-height: 0; font-size: .68rem; }
+  .product-price { font-size: .68rem; }
+  .product-actions { flex-direction: column; gap: 6px; }
+  .product-actions .button { min-height: 37px; font-size: .65rem; padding: 8px 5px; }
+  .product-badge { top: 7px; left: 7px; padding: 5px 7px; font-size: .5rem; }
+  .favorite-button { top: 7px; right: 7px; width: 31px; height: 31px; }
+  .quick-view { right: 7px; bottom: 7px; left: 7px; padding: 8px 3px; font-size: .62rem; }
+
+  .recent-grid { grid-template-columns: 1fr; }
+  .about-section { padding-top: 15px; }
+  .about-glass { grid-template-columns: 1fr; gap: 25px; padding: 27px 22px; border-radius: 24px; }
+  .about-emblem { width: 170px; height: 170px; }
+  .about-emblem img { width: 90px; height: 90px; }
+  .contact-grid { gap: 10px; }
+  .contact-card { padding: 13px; }
+
+  .footer-inner { width: calc(100% - 30px); align-items: flex-start; flex-direction: column; gap: 12px; }
+  .site-footer { padding-bottom: 100px; }
+
+  .floating-wa { right: 12px; bottom: 82px; padding: 11px 14px; font-size: .72rem; }
+
+  .mobile-nav {
+    position: fixed;
+    right: 9px;
+    bottom: 8px;
+    left: 9px;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 8px 5px max(8px, env(safe-area-inset-bottom));
+    border-radius: 21px;
+    background: #1d1a2ce8;
+    box-shadow: 0 12px 35px #00000035;
+  }
+
+  .mobile-nav a, .mobile-nav button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    padding: 4px 2px;
+    border: 0;
+    border-radius: 12px;
+    color: #e9e2f5;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .mobile-nav span { font-size: 1.25rem; line-height: 1.2; }
+  .mobile-nav small { color: var(--muted); font-size: .58rem; }
+
+  .modal-backdrop { padding: 10px; }
+  .detail-modal { padding: 18px; border-radius: 22px; }
+  .detail-layout { grid-template-columns: 1fr; gap: 20px; }
+  .detail-main-image { max-height: 300px; aspect-ratio: 4 / 3; }
+  .detail-copy h2 { font-size: 1.8rem; }
+  .toast { bottom: 88px; }
+}
+
+/* 20. HP kecil */
+@media (max-width: 380px) {
+  .section-shell { width: calc(100% - 24px); }
+  .brand-text strong { font-size: .59rem; }
+  .brand-text small { font-size: .39rem; }
+  .site-header { gap: 6px; padding-inline: 8px; }
+  .product-grid { gap: 8px; }
+  .product-info { padding: 9px; }
+  .product-title { font-size: .88rem; }
+  .product-actions .button { font-size: .61rem; }
+}
+
+/* 21. Kurangi gerakan untuk aksesibilitas */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 22. Mode transparansi rendah */
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .site-header, .mobile-nav, .catalog-search,
+  .floating-wa, .product-badge, .favorite-button, .quick-view {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .glass, .site-header, .mobile-nav { background: #211d31; }
+}
